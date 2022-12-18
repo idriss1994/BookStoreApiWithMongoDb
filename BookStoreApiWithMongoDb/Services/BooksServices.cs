@@ -30,6 +30,6 @@ namespace BookStoreApiWithMongoDb.Services
                 await _booksCollection.ReplaceOneAsync(b => b.Id == id, updatedBook);
 
         public async Task RemoveAsync(string id) =>
-            await _booksCollection.DeleteOneAsync(id);
+            await _booksCollection.DeleteOneAsync(b => b.Id == id);
     }
 }
