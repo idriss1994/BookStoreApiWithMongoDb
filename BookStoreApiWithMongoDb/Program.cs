@@ -1,11 +1,25 @@
 using BookStoreApiWithMongoDb.Models;
 using BookStoreApiWithMongoDb.Services;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<BookStoreDatabaseSettings>(
     builder.Configuration.GetSection("BookStoreDatabase"));
+
+builder.Services.Configure<StudentStoreDatabaseSettings>(
+    builder.Configuration.GetSection(nameof(StudentStoreDatabaseSettings)));
+
+builder.Services.AddSingleton<IStudentStoreDatabaseSettings>(serviceProvider =>
+       serviceProvider.GetRequiredService<IOptions<StudentStoreDatabaseSettings>>().Value);
+
+builder.Services.AddSingleton<IMongoClient>(_ => 
+        new MongoClient(builder.Configuration.GetValue<string>("StudentStoreDatabaseSettings:ConnectionString")));
+
+builder.Services.AddScoped<IStudentService, StudentService>();
+
 builder.Services.AddSingleton<BooksServices>();
 
 builder.Services.AddControllers()
